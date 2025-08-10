@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TOGA - Product Details</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+/>
+<style>
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9fafb;
+  }
+  .product-slider {
+    position: relative;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    border-radius: 0.5rem;
+  }
+  .product-slider img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .slider-controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .slider-btn {
+    pointer-events: all;
+    background: rgba(255, 255, 255, 0.7);
+    color: black;
+    padding: 0.3rem 0.6rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 0 0.5rem;
+  }
+  .related-card {
+    transition: all 0.3s ease;
+    aspect-ratio: 4/5;
+  }
+  .related-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  .related-image {
+    width: 100%;
+    height: 80%;
+    object-fit: cover;
+  }
+  .related-info {
+    padding: 0.75rem;
+    height: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .related-name {
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .related-price {
+    color: #e53e3e;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  .related-old-price {
+    color: #9ca3af;
+    text-decoration: line-through;
+    font-size: 0.9rem;
+  }
+  .size-btn {
+    border: 1px solid #ccc;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.375rem;
+    background: white;
+    transition: all 0.2s ease;
+  }
+  .size-btn:hover {
+    background: #f3f4f6;
+  }
+  .size-btn.active {
+    background: black;
+    color: white;
+    border-color: black;
+  }
+  @keyframes cart-bounce {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+    }
+  }
+  .cart-animate {
+    animation: cart-bounce 0.4s ease;
+  }
+  .wishlist-btn.active {
+    color: red;
+  }
+  .social-icon {
+    transition: transform 0.3s ease;
+  }
+  .social-icon:hover {
+    transform: scale(1.2);
+  }
+  .size-guide-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .size-guide-modal.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .size-guide-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .size-guide-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  .close-size-guide {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+  .size-guide-btn {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    margin-left: 1rem;
+  }
+  .size-guide-btn:hover {
+    background-color: black;
+    color: white;
+  }
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav
+    class="bg-black text-white p-4 sticky top-0 z-50 shadow-md"
+  >
+    <div
+      class="container mx-auto flex justify-between items-center"
+    >
+      <h1 class="text-2xl font-bold tracking-wide">TOGA</h1>
+      <div class="flex items-center gap-8">
+        <div class="hidden md:flex items-center gap-6 mr-8">
+          <span>Follow Us :</span>
+          <div class="flex gap-4">
+            <a
+              href="https://www.facebook.com/share/1BThiHEVSr/?mibextid=wwXIfr"
+              class="social-icon hover:text-gray-300"
+              ><i class="fab fa-facebook"></i
+            ></a>
+            <a
+              href="https://www.instagram.com/toga_eg_?igsh=MWF2MGV2dGJ3azdiNg%3D%3D&utm_source=qr"
+              class="social-icon hover:text-gray-300"
+              ><i class="fab fa-instagram"></i
+            ></a>
+            <a
+              href="https://www.tiktok.com/@toga.eg?_t=ZS-8yii9fodbxR&_r=1"
+              class="social-icon hover:text-gray-300"
+              ><i class="fab fa-tiktok"></i
+            ></a>
+          </div>
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="index.html" class="hover:text-gray-300">Store</a>
+          <div class="relative">
+            <button
+              id="wishlistButton"
+              class="flex items-center gap-1 hover:text-gray-300 transition"
+            >
+              <i class="far fa-heart text-xl"></i>
+            </button>
+          </div>
+          <div class="relative">
+            <button
+              id="cartButton"
+              class="flex items-center gap-2 hover:text-gray-300 transition"
+            >
+              🛒 <span id="cartCount">0</span>
+            </button>
+            <div
+              id="cartDropdown"
+              class="hidden absolute right-0 mt-2 w-80 bg-white text-black rounded shadow-lg z-50 p-4"
+            >
+              <h3 class="font-bold border-b pb-2">Shopping Cart</h3>
+              <div
+                id="cartItems"
+                class="max-h-60 overflow-y-auto py-2"
+              ></div>
+              <div
+                class="border-t pt-2 flex justify-between items-center"
+              >
+                <span class="font-bold">Total:</span>
+                <span id="cartTotal">0.00 EGP</span>
+              </div>
+              <button
+                id="checkoutBtn"
+                class="w-full mt-2 bg-black text-white py-2 rounded hover:bg-gray-800"
+              >
+                Checkout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Product Details -->
+  <main class="container mx-auto px-4 py-8">
+    <div
+      id="productDetails"
+      class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start"
+    ></div>
+
+    <hr class="my-10" />
+
+    <!-- Related Products -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-6">You may also like</h2>
+      <div
+        id="relatedProducts"
+        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+      ></div>
+    </section>
+  </main>
+
+  <!-- Wishlist Modal -->
+  <div
+    id="wishlistModal"
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4"
+  >
+    <div
+      class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+    >
+      <div class="flex justify-between items-center border-b p-4">
+        <h3 class="text-xl font-bold">Your Wishlist</h3>
+        <button id="closeWishlist" class="text-2xl">&times;</button>
+      </div>
+      <div
+        id="wishlistItems"
+        class="p-4 overflow-y-auto"
+      >
+        <p class="text-center text-gray-500">Your wishlist is empty</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size Guide Modal -->
+  <div id="sizeGuideModal" class="size-guide-modal">
+    <div class="size-guide-content">
+      <button class="close-size-guide">&times;</button>
+      <h3 class="text-xl font-bold mb-4">Size Guide</h3>
+      <img src="size-chart.jpg" alt="Size Guide Chart" />
+    </div>
+  </div>
+
+  <script>
+    let products = JSON.parse(localStorage.getItem("allProducts")) || [];
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    const productDetails = document.getElementById("productDetails");
+    const relatedProductsContainer = document.getElementById("relatedProducts");
+    const cartButton = document.getElementById("cartButton");
+    const cartDropdown = document.getElementById("cartDropdown");
+    const cartItems = document.getElementById("cartItems");
+    const cartCount = document.getElementById("cartCount");
+    const cartTotal = document.getElementById("cartTotal");
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const wishlistButton = document.getElementById("wishlistButton");
+    const wishlistModal = document.getElementById("wishlistModal");
+    const wishlistItems = document.getElementById("wishlistItems");
+    const closeWishlist = document.getElementById("closeWishlist");
+    const sizeGuideModal = document.getElementById("sizeGuideModal");
+    const closeSizeGuide = document.querySelector(".close-size-guide");
+
+    function toggleSizeGuide() {
+      sizeGuideModal.classList.toggle("active");
+    }
+
+    closeSizeGuide.addEventListener("click", toggleSizeGuide);
+    sizeGuideModal.addEventListener("click", (e) => {
+      if (e.target === sizeGuideModal) {
+        toggleSizeGuide();
+      }
+    });
+
+    function updateCartCount() {
+      cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    function renderCartItems() {
+      cartItems.innerHTML = "";
+      if (cart.length === 0) {
+        cartItems.innerHTML = `<p class="text-center text-gray-500">Your cart is empty</p>`;
+        cartTotal.textContent = "0.00 EGP";
+        return;
+      }
+      let total = 0;
+      cart.forEach((item, index) => {
+        total += item.price * item.quantity;
+        const div = document.createElement("div");
+        div.className = "flex justify-between items-center mb-2 border-b pb-1";
+        div.innerHTML = `
+          <span>${item.name} (${item.size}) × ${item.quantity}</span>
+          <div class="flex items-center gap-2">
+            <span>${(item.price * item.quantity).toFixed(2)} EGP</span>
+            <button class="text-red-500 hover:text-red-700" onclick="removeFromCart(${index})">🗑</button>
+          </div>
+        `;
+        cartItems.appendChild(div);
+      });
+      cartTotal.textContent = total.toFixed(2) + " EGP";
+    }
+
+    function renderWishlist() {
+      wishlistItems.innerHTML = "";
+      if (wishlist.length === 0) {
+        wishlistItems.innerHTML = `<p class="text-center text-gray-500">Your wishlist is empty</p>`;
+        return;
+      }
+
+      wishlist.forEach((product) => {
+        const item = document.createElement("div");
+        item.className = "flex items-center gap-4 mb-4 border-b pb-4";
+        item.innerHTML = `
+          <img src="${product.images[0]}" alt="${product.name}" class="w-20 h-20 object-cover rounded" />
+          <div class="flex-grow">
+            <h4 class="font-bold">${product.name}</h4>
+            <p class="text-red-600 font-bold">${product.price.toFixed(2)} EGP</p>
+          </div>
+          <button class="remove-from-wishlist text-red-500" data-id="${product.id}">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        wishlistItems.appendChild(item);
+      });
+
+      document.querySelectorAll(".remove-from-wishlist").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const productId = parseInt(btn.dataset.id);
+          wishlist = wishlist.filter((item) => item.id !== productId);
+          localStorage.setItem("wishlist", JSON.stringify(wishlist));
+          renderWishlist();
+        });
+      });
+    }
+
+    window.removeFromCart = function (index) {
+      cart.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCartItems();
+      updateCartCount();
+    };
+
+    function loadProduct(productId) {
+      const product = products.find((p) => p.id == productId);
+      if (!product) {
+        productDetails.innerHTML = `<p class="text-red-500">Product not found</p>`;
+        return;
+      }
+
+      const isInWishlist = wishlist.some((item) => item.id === product.id);
+
+      productDetails.innerHTML = `
+        <div class="product-slider w-full md:w-5/6 mx-auto relative">
+          <button class="absolute top-2 right-2 z-10 wishlist-btn ${
+            isInWishlist ? "active" : ""
+          }" data-id="${product.id}">
+            <i class="far fa-heart text-2xl ${
+              isInWishlist ? "text-red-500" : "text-white"
+            }"></i>
+          </button>
+          <img src="${product.images[0]}" alt="${product.name}" class="product-image" />
+          <div class="slider-controls">
+            <button class="slider-btn prev-btn">❮</button>
+            <button class="slider-btn next-btn">❯</button>
+          </div>
+        </div>
+        <div class="px-2 md:px-0">
+          <h1 class="text-2xl md:text-3xl font-bold mb-4">${product.name}</h1>
+          ${
+            product.oldPrice
+              ? `<p class="text-gray-500 line-through">${product.oldPrice.toFixed(
+                  2
+                )} EGP</p>`
+              : ""
+          }
+          <p class="text-red-600 text-xl md:text-2xl font-bold mb-4">${product.price.toFixed(
+            2
+          )} EGP</p>
+          <p class="mb-4 text-gray-700">${product.description}</p>
+          <div class="mb-6">
+            <p class="font-medium mb-2">Size:</p>
+            <div class="flex flex-wrap gap-2">
+              ${product.sizes
+                .map((size) => `<button class="size-btn" data-size="${size}">${size}</button>`)
+                .join("")}
+            </div>
+          </div>
+          <div class="button-group">
+            <button
+              id="addToCartBtn"
+              class="w-full md:w-auto bg-black text-white px-8 py-3 rounded hover:bg-gray-800 transition"
+            >
+              Add to Cart
+            </button>
+            <button class="size-guide-btn" onclick="toggleSizeGuide()">
+              Size Guide
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Initialize slider functionality
+      let currentIndex = 0;
+      const sliderImg = document.querySelector(".product-image");
+      const prevBtn = document.querySelector(".prev-btn");
+      const nextBtn = document.querySelector(".next-btn");
+      const wishlistBtn = document.querySelector(".wishlist-btn");
+
+      if (product.images.length > 1) {
+        prevBtn.addEventListener("click", () => {
+          currentIndex = (currentIndex - 1 + product.images.length) % product.images.length;
+          sliderImg.src = product.images[currentIndex];
+        });
+        nextBtn.addEventListener("click", () => {
+          currentIndex = (currentIndex + 1) % product.images.length;
+          sliderImg.src = product.images[currentIndex];
+        });
+
+        // Auto slide every 3 seconds
+        setInterval(() => {
+          currentIndex = (currentIndex + 1) % product.images.length;
+          sliderImg.src = product.images[currentIndex];
+        }, 3000);
+      } else {
+        // Hide controls if only one image
+        document.querySelector(".slider-controls").style.display = "none";
+      }
+
+      wishlistBtn.addEventListener("click", () => {
+        const heartIcon = wishlistBtn.querySelector("i");
+        const isActive = heartIcon.classList.contains("text-red-500");
+
+        if (isActive) {
+          wishlist = wishlist.filter((item) => item.id !== product.id);
+          heartIcon.classList.remove("text-red-500");
+        } else {
+          wishlist.push(product);
+          heartIcon.classList.add("text-red-500");
+        }
+
+        localStorage.setItem("wishlist", JSON.stringify(wishlist));
+        renderWishlist();
+      });
+
+      let selectedSize = null;
+      document.querySelectorAll(".size-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".size-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          selectedSize = btn.dataset.size;
+        });
+      });
+
+      document.getElementById("addToCartBtn").addEventListener("click", () => {
+        if (!selectedSize) {
+          alert("Please select a size");
+          return;
+        }
+        const existing = cart.find((i) => i.id === product.id && i.size === selectedSize);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ ...product, size: selectedSize, quantity: 1 });
+        }
+        localStorage.setItem("cart", JSON.stringify(cart));
+        updateCartCount();
+        cartCount.classList.add("cart-animate");
+        setTimeout(() => cartCount.classList.remove("cart-animate"), 400);
+        alert("Product added to cart");
+      });
+
+      renderRelatedProducts(productId);
+    }
+
+    function renderRelatedProducts(currentId) {
+      relatedProductsContainer.innerHTML = "";
+      const relatedProducts = products.filter((p) => p.id != currentId);
+
+      if (relatedProducts.length === 0) {
+        relatedProductsContainer.innerHTML = `<p class="col-span-full text-center text-gray-500">No related products found</p>`;
+        return;
+      }
+
+      relatedProducts.forEach((product) => {
+        const card = document.createElement("div");
+        card.className =
+          "related-card bg-white rounded shadow overflow-hidden cursor-pointer flex flex-col";
+        card.innerHTML = `
+          <div class="flex-grow">
+            <img src="${product.images[0]}" alt="${product.name}" class="related-image w-full h-full object-cover" />
+          </div>
+          <div class="related-info p-3 flex flex-col justify-between flex-grow-0">
+            <h3 class="related-name text-sm font-bold mb-1 truncate">${product.name}</h3>
+            <div class="flex items-center gap-2">
+              ${
+                product.oldPrice
+                  ? `<p class="related-old-price text-xs line-through text-gray-500">${product.oldPrice.toFixed(
+                      2
+                    )} EGP</p>`
+                  : ""
+              }
+              <p class="related-price text-sm font-bold text-red-600">${product.price.toFixed(
+                2
+              )} EGP</p>
+            </div>
+          </div>
+        `;
+        card.addEventListener("click", () => {
+          loadProduct(product.id);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        relatedProductsContainer.appendChild(card);
+      });
+    }
+
+    // Toggle cart dropdown
+    cartButton.addEventListener("click", () => {
+      if (cartDropdown.classList.contains("hidden")) {
+        renderCartItems();
+        cartDropdown.classList.remove("hidden");
+      } else {
+        cartDropdown.classList.add("hidden");
+      }
+    });
+
+    // Checkout button
+    checkoutBtn.addEventListener("click", () => {
+      if (cart.length === 0) {
+        alert("Your cart is empty");
+        return;
+      }
+      window.location.href = "checkout.html";
+    });
+
+    // Wishlist modal toggle
+    wishlistButton.addEventListener("click", () => {
+      wishlistModal.classList.remove("hidden");
+      renderWishlist();
+    });
+    closeWishlist.addEventListener("click", () => {
+      wishlistModal.classList.add("hidden");
+    });
+
+    // Get product ID from URL
+    function getProductIdFromUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('id');
+    }
+
+    // Load initial product based on URL
+    document.addEventListener('DOMContentLoaded', () => {
+      const productId = getProductIdFromUrl();
+      if (productId) {
+        loadProduct(parseInt(productId));
+      } else if (products.length > 0) {
+        loadProduct(products[0].id);
+      } else {
+        productDetails.innerHTML = `<p class="text-center text-gray-500">No products available</p>`;
+      }
+      updateCartCount();
+    });
+  </script>
+  <footer class="bg-black text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4">TOGA</h3>
+          <p class="text-gray-400">Premium clothing for the modern lifestyle.</p>
+          <div class="flex gap-4 mt-4">
+            <a href="https://www.facebook.com/share/1BThiHEVSr/?mibextid=wwXIfr" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/toga_eg_?igsh=MWF2MGV2dGJ3azdiNg%3D%3D&utm_source=qr" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@toga.eg?_t=ZS-8yii9fodbxR&_r=1" class="text-gray-400 hover:text-white"><i class="fab fa-tiktok"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="text-gray-400 hover:text-white">Home</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Shop</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold mb-4">Contact Us</h3>
+          <ul class="space-y-2 text-gray-400">
+            <li class="flex items-center gap-2"><i class="fas fa-phone"></i>01030130845</li>
+            <li class="flex items-center gap-2"><i class="fas fa-envelope"></i> info@toga.com</li>
+            <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> Cairo, Egypt</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 TOGA. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

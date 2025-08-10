@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>طلب المنتج - TOGA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9fafb;
+      color: #111827;
+    }
+    
+    .form-container {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-input {
+      border: 1px solid #d1d5db;
+      transition: border-color 0.2s ease;
+    }
+    
+    .form-input:focus {
+      border-color: #000;
+      outline: none;
+    }
+    
+    .submit-btn {
+      background-color: #000;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    
+    .submit-btn:hover {
+      background-color: #333;
+    }
+    
+    .total-price {
+      color: #ef4444;
+      font-weight: bold;
+    }
+    
+    @media (max-width: 640px) {
+      .form-container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navbar -->
+  <nav class="bg-black text-white p-4 sticky top-0 z-50 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold tracking-wide">TOGA</h1>
+      <div class="flex items-center gap-6">
+        <a href="index.html" class="hover:text-gray-300">المتجر</a>
+        <div class="relative">
+          <button id="cartButton" class="flex items-center gap-2 hover:text-gray-300 transition">
+            🛒 <span id="cartCount">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Checkout Form -->
+  <main class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-2xl font-bold mb-6 text-center">إتمام الطلب</h2>
+      
+      <div class="form-container p-6 mb-8">
+        <form id="checkoutForm" class="space-y-4">
+          <div>
+            <label for="name" class="block text-sm font-medium mb-1">الاسم الكامل</label>
+            <input type="text" id="name" name="name" class="form-input w-full p-3 rounded" placeholder="الاسم الثلاثي" required>
+          </div>
+          
+          <div>
+            <label for="phone" class="block text-sm font-medium mb-1">رقم الهاتف</label>
+            <input type="text" id="phone" name="phone" class="form-input w-full p-3 rounded" placeholder="رقم الهاتف" required>
+          </div>
+          
+          <div>
+            <label for="governorate" class="block text-sm font-medium mb-1">المحافظة</label>
+            <select id="governorate" name="governorate" class="form-input w-full p-3 rounded" required>
+              <option value="">اختر المحافظة</option>
+              <option value="القاهرة">القاهرة</option>
+              <option value="الجيزة">الجيزة</option>
+              <option value="الإسكندرية">الإسكندرية</option>
+              <option value="الدقهلية">الدقهلية</option>
+              <option value="البحيرة">البحيرة</option>
+              <option value="الشرقية">الشرقية</option>
+              <option value="الغربية">الغربية</option>
+              <option value="المنوفية">المنوفية</option>
+              <option value="كفر الشيخ">كفر الشيخ</option>
+              <option value="الفيوم">الفيوم</option>
+              <option value="بني سويف">بني سويف</option>
+              <option value="المنيا">المنيا</option>
+              <option value="أسيوط">أسيوط</option>
+              <option value="سوهاج">سوهاج</option>
+              <option value="قنا">قنا</option>
+              <option value="الأقصر">الأقصر</option>
+              <option value="أسوان">أسوان</option>
+              <option value="البحر الأحمر">البحر الأحمر</option>
+              <option value="الوادي الجديد">الوادي الجديد</option>
+              <option value="مطروح">مطروح</option>
+              <option value="شمال سيناء">شمال سيناء</option>
+              <option value="جنوب سيناء">جنوب سيناء</option>
+              <option value="دمياط">دمياط</option>
+              <option value="بورسعيد">بورسعيد</option>
+              <option value="الإسماعيلية">الإسماعيلية</option>
+              <option value="السويس">السويس</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="address" class="block text-sm font-medium mb-1">العنوان التفصيلي</label>
+            <input type="text" id="address" name="address" class="form-input w-full p-3 rounded" placeholder="الحي، الشارع، رقم العمارة، الشقة" required>
+          </div>
+          
+          <div>
+            <label for="order_items" class="block text-sm font-medium mb-1">تفاصيل الطلب</label>
+            <textarea id="order_items" name="order_items" class="form-input w-full p-3 rounded" rows="4" readonly></textarea>
+          </div>
+          
+          <input type="hidden" id="subtotal" name="subtotal">
+          <input type="hidden" id="shipping" name="shipping">
+          <input type="hidden" id="total" name="total">
+          
+          <div class="flex justify-between items-center pt-4 border-t">
+            <span class="font-bold">المجموع الكلي:</span>
+            <span id="totalPrice" class="total-price text-xl">0</span> جنيه
+          </div>
+          
+          <button type="submit" class="submit-btn w-full py-3 rounded font-bold mt-6">
+            تأكيد الطلب
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-black text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4">TOGA</h3>
+          <p class="text-gray-400">ملابس عالية الجودة للأناقة الحديثة.</p>
+          <div class="flex gap-4 mt-4">
+            <a href="https://www.facebook.com/share/1BThiHEVSr/?mibextid=wwXIfr" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/toga_eg_?igsh=MWF2MGV2dGJ3azdiNg%3D%3D&utm_source=qr" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@toga.eg?_t=ZS-8yii9fodbxR&_r=1" class="text-gray-400 hover:text-white"><i class="fab fa-tiktok"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold mb-4">روابط سريعة</h3>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="text-gray-400 hover:text-white">الرئيسية</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">المتجر</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">من نحن</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">اتصل بنا</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold mb-4">تواصل معنا</h3>
+          <ul class="space-y-2 text-gray-400">
+            <li class="flex items-center gap-2"><i class="fas fa-phone"></i>01030130845</li>
+            <li class="flex items-center gap-2"><i class="fas fa-envelope"></i> info@toga.com</li>
+            <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> القاهرة، مصر</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 TOGA. جميع الحقوق محفوظة.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- EmailJS Library -->
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("7b9kqgwKpK5WGF8Zl");
+    })();
+  </script>
+
+  <script>
+    const governorateSelect = document.getElementById("governorate");
+    const subtotalField = document.getElementById("subtotal");
+    const shippingField = document.getElementById("shipping");
+    const totalField = document.getElementById("total");
+    const totalPriceEl = document.getElementById("totalPrice");
+    const orderItemsField = document.getElementById("order_items");
+    const cartCount = document.getElementById("cartCount");
+
+    let cartSubtotal = 0;
+
+    // تحميل السلة من LocalStorage
+    function loadCart() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      if (cart.length === 0) {
+        orderItemsField.value = "لا توجد منتجات في السلة";
+        return;
+      }
+
+      let itemsText = "";
+      cartSubtotal = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        cartSubtotal += itemTotal;
+        itemsText += `${item.name} (${item.size}) - الكمية: ${item.quantity} - السعر: ${itemTotal} جنيه\n`;
+      });
+
+      orderItemsField.value = itemsText.trim();
+      subtotalField.value = cartSubtotal;
+      cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    loadCart();
+
+    const shippingRates = {
+      "القاهرة": 70,
+      "الجيزة": 70
+    };
+
+    governorateSelect.addEventListener("change", () => {
+      let shippingCost;
+      if (shippingRates.hasOwnProperty(governorateSelect.value)) {
+        shippingCost = shippingRates[governorateSelect.value];
+      } else if (governorateSelect.value) {
+        shippingCost = 80;
+      } else {
+        shippingCost = 0;
+      }
+
+      shippingField.value = shippingCost;
+      const total = cartSubtotal + shippingCost;
+      totalField.value = total;
+      totalPriceEl.textContent = total;
+    });
+
+    document.getElementById("checkoutForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      emailjs.sendForm(
+        "service_8lldcyc",
+        "template_dla4amj",
+        this
+      ).then(function() {
+        alert("تم إرسال الطلب بنجاح ✅");
+        localStorage.removeItem("cart");
+        window.location.href = "index.html";
+      }, function(error) {
+        alert("حدث خطأ أثناء الإرسال ❌");
+        console.error(error);
+      });
+    });
+  </script>
+  <footer class="bg-black text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4">TOGA</h3>
+          <p class="text-gray-400">Premium clothing for the modern lifestyle.</p>
+          <div class="flex gap-4 mt-4">
+            <a href="https://www.facebook.com/share/1BThiHEVSr/?mibextid=wwXIfr" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/toga_eg_?igsh=MWF2MGV2dGJ3azdiNg%3D%3D&utm_source=qr" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@toga.eg?_t=ZS-8yii9fodbxR&_r=1" class="text-gray-400 hover:text-white"><i class="fab fa-tiktok"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="text-gray-400 hover:text-white">Home</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Shop</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-bold mb-4">Contact Us</h3>
+          <ul class="space-y-2 text-gray-400">
+            <li class="flex items-center gap-2"><i class="fas fa-phone"></i>01030130845</li>
+            <li class="flex items-center gap-2"><i class="fas fa-envelope"></i> info@toga.com</li>
+            <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> Cairo, Egypt</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 TOGA. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

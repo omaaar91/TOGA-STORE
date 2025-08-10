@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOGA Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+   body { 
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+     background-color: #f9fafb; 
+   }
+
+   .product-card { 
+     transition: transform 0.3s ease, box-shadow 0.3s ease; 
+   }
+   .product-card:hover { 
+     transform: translateY(-5px); 
+     box-shadow: 0 10px 20px rgba(0,0,0,0.08); 
+   }
+
+   .size-btn { 
+     border: 1px solid #ccc; 
+     padding: 0.4rem 0.8rem; 
+     border-radius: 0.375rem; 
+     background: white; 
+     transition: all 0.2s ease; 
+   }
+   .size-btn:hover { background: #f3f4f6; }
+   .size-btn.active { 
+     background: black; 
+     color: white; 
+     border-color: black; 
+   }
+
+   .slider { 
+     position: relative; 
+     overflow: hidden; 
+     aspect-ratio: 4 / 5;
+   }
+   .slider img { 
+     width: 100%; 
+     height: 100%; 
+     object-fit: cover; 
+     cursor: pointer; 
+   }
+
+   .slider-controls { 
+     position: absolute; 
+     top: 50%; 
+     width: 100%; 
+     display: flex; 
+     justify-content: space-between; 
+     transform: translateY(-50%); 
+     pointer-events: none; 
+   }
+   .slider-btn { 
+     pointer-events: all; 
+     background: rgba(255,255,255,0.7); 
+     color: black; 
+     padding: 0.3rem 0.6rem; 
+     border-radius: 50%; 
+     cursor: pointer; 
+     font-weight: bold; 
+     font-size: 1.2rem; 
+   }
+
+   @keyframes cart-bounce { 
+     0%,100% { transform: scale(1); } 
+     50% { transform: scale(1.3); } 
+   }
+   .cart-animate { animation: cart-bounce 0.4s ease; }
+
+   .wishlist-btn.active { color: red; }
+   .social-icon { transition: transform 0.3s ease; }
+   .social-icon:hover { transform: scale(1.2); }
+  </style>
+</head>
+<body class="text-gray-900">
+
+ <!-- Navbar -->
+<nav class="bg-black text-white p-4 sticky top-0 z-50 shadow-md">
+  <div class="container mx-auto flex justify-between items-center">
+    <h1 class="text-2xl font-bold tracking-wide">TOGA</h1>
+    <div class="flex items-center gap-8">
+      <div class="hidden md:flex items-center gap-6 mr-8">
+        <span>Follow Us :</span>
+        <div class="flex gap-4">
+          <a href="https://www.facebook.com/share/1BThiHEVSr/?mibextid=wwXIfr" class="social-icon hover:text-gray-300"><i class="fab fa-facebook"></i></a>
+          <a href="https://www.instagram.com/toga_eg_?igsh=MWF2MGV2dGJ3azdiNg%3D%3D&utm_source=qr" class="social-icon hover:text-gray-300"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.tiktok.com/@toga.eg?_t=ZS-8yii9fodbxR&_r=1" class="social-icon hover:text-gray-300"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="index.html" class="hover:text-gray-300">Store</a>
+        <div class="relative">
+          <button id="wishlistButton" class="flex items-center gap-1 hover:text-gray-300 transition">
+            <i class="far fa-heart text-xl"></i>
+          </button>
+        </div>
+        <div class="relative">
+          <button id="cartButton" class="flex items-center gap-2 hover:text-gray-300 transition">
+            🛒 <span id="cartCount">0</span>
+          </button>
+          <div id="cartDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white text-black rounded shadow-lg z-50 p-4">
+            <h3 class="font-bold border-b pb-2">Shopping Cart</h3>
+            <div id="cartItems" class="max-h-60 overflow-y-auto py-2"></div>
+            <div class="border-t pt-2 flex justify-between items-center">
+              <span class="font-bold">Total:</span>
+              <span id="cartTotal">0.00 EGP</span>
+            </div>
+            <button id="checkoutBtn" class="w-full mt-2 bg-black text-white py-2 rounded hover:bg-gray-800">Checkout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+  <!-- Products -->
+  <main class="container mx-auto px-4 py-8">
+    <section id="products">
+      <h2 class="text-3xl font-bold mb-6 text-center">Our Products</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" id="productsContainer"></div>
+    </section>
+  </main>
+
+  <!-- Wishlist Modal -->
+  <div id="wishlistModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+      <div class="flex justify-between items-center border-b p-4">
+        <h3 class="text-xl font-bold">Your Wishlist</h3>
+        <button id="closeWishlist" class="text-2xl">&times;</button>
+      </div>
+      <div id="wishlistItems" class="p-4 overflow-y-auto">
+        <p class="text-center text-gray-500">Your wishlist is empty</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let products = [
+      {
+        id: 1,
+        name: "Over-size",
+        oldPrice: 700,
+        price: 500,
+        sizes: ["M","L", "XL", "XXL"],
+        images: [
+          "1.jpg",
+          "2.jpg",
+        
+        ],
+        description: "Wear your vibe , High-quality cotton t-shirt for everyday wear."
+      },
+      {
+        id: 2,
+        name: "Shadow Art-black edition",
+        oldPrice: 700,
+        price: 500,
+        sizes: ["M","L", "XL", "XXL"],
+        images: [
+          "5.jpg",
+          "6.jpg"
+        ],
+        description: "Minimal. Powerful."
+      },
+      {
+        id: 3,
+        name: "Shadow Art",
+        oldPrice: 700,
+        price: 500,
+        sizes: ["M","L", "XL", "XXL"],
+        images: [
+          "3.jpg",
+          "4.jpg"
+        ],
+        description: "Urban and fearless"
+      },
+      {
+        id: 4,
+        name: "Pixel Pop",
+        oldPrice: 700,
+        price: 500,
+        sizes:["M","L", "XL", "XXL"],
+        images: [
+          "9.jpg",
+          "10.jpg"
+        ],
+        description: "Loose, Cool, You, Comfortable T-Shirt made from premium fabric."
+      },
+      {
+        id: 5,
+        name: "Toga Originals",
+        oldPrice: 700,
+        price: 500,
+        sizes: ["M","L", "XL", "XXL"],
+        images: [
+          "7.jpg",
+          "8.jpg"
+        ],
+        description: "Street-ready fit"
+      },
+      {
+        id: 6,
+        name: "Wave Print",
+        oldPrice: 700,
+        price: 500,
+        sizes:["M","L", "XL", "XXL"],
+        images: [
+          "11.jpg",
+          "12.jpg"
+        ],
+        description: "Made to stand out."
+      },
+      {
+        id: 7,
+        name: "Street Essence",
+        oldPrice: 700,
+        price: 500,
+        sizes:["M","L", "XL", "XXL"],
+        images: [
+          "13.jpg",
+          "14.jpg"
+        ],
+        description: "Bold & oversized"
+      } ,
+      {
+        id: 8,
+        name: "White-Basic",
+        oldPrice: 600,
+        price: 400,
+        sizes:["M","L", "XL", "XXL"],
+        images: [
+          "15.jpg",
+          "16.jpg"
+        ],
+        description: "Comfortable white basic T-Shirt made from premium fabric."
+      },
+      {
+        id: 9,
+        name: "Black-Basic",
+        oldPrice: 600,
+        price: 400,
+        sizes:["M","L", "XL", "XXL"],
+        images: [
+          "17.jpg",
+          "18.jpg"
+        ],
+        description: "Comfortable black basic T-Shirt made from premium fabric."
+      }
+    ];
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    const productsContainer = document.getElementById("productsContainer");
+    const cartButton = document.getElementById("cartButton");
+    const cartDropdown = document.getElementById("cartDropdown");
+    const cartItems = document.getElementById("cartItems");
+    const cartCount = document.getElementById("cartCount");
+    const cartTotal = document.getElementById("cartTotal");
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const wishlistButton = document.getElementById("wishlistButton");
+    const wishlistModal = document.getElementById("wishlistModal");
+    const wishlistItems = document.getElementById("wishlistItems");
+    const closeWishlist = document.getElementById("closeWishlist");
+
+    function renderProducts() {
+      localStorage.setItem("allProducts", JSON.stringify(products));
+      productsContainer.innerHTML = "";
+      if (products.length === 0) {
+        productsContainer.innerHTML = `<p class="col-span-full text-center text-gray-500">No products available</p>`;
+        return;
+      }
+      products.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product-card bg-white rounded shadow overflow-hidden flex flex-col";
+
+        let currentIndex = 0;
+        const isInWishlist = wishlist.some(item => item.id === product.id);
+        
+        card.innerHTML = `
+          <div class="slider relative">
+            <button class="absolute top-2 right-2 z-10 wishlist-btn ${isInWishlist ? 'active' : ''}" data-id="${product.id}">
+              <i class="far fa-heart text-2xl ${isInWishlist ? 'text-red-500' : 'text-white'}"></i>
+            </button>
+            <img loading="lazy" src="${product.images[0]}" alt="${product.name}" class="product-image" />
+            <div class="slider-controls">
+              <button class="slider-btn prev-btn">❮</button>
+              <button class="slider-btn next-btn">❯</button>
+            </div>
+          </div>
+          <div class="p-4 flex flex-col flex-grow">
+            <h3 class="font-bold text-lg mb-1">${product.name}</h3>
+            <p class="text-gray-500 line-through mb-1">${product.oldPrice ? product.oldPrice.toFixed(2) + " EGP" : ""}</p>
+            <p class="text-red-600 font-bold mb-2">${product.price.toFixed(2)} EGP</p>
+            <div class="flex gap-2 mb-3">
+              ${product.sizes.map(size => `<button class="size-btn" data-size="${size}">${size}</button>`).join('')}
+            </div>
+            <button class="bg-black text-white px-3 py-2 rounded hover:bg-gray-800 add-to-cart-btn">Add to Cart</button>
+          </div>
+        `;
+
+        const sliderImg = card.querySelector(".product-image");
+        const prevBtn = card.querySelector(".prev-btn");
+        const nextBtn = card.querySelector(".next-btn");
+        const wishlistBtn = card.querySelector(".wishlist-btn");
+
+        prevBtn.addEventListener("click", () => {
+          currentIndex = (currentIndex - 1 + product.images.length) % product.images.length;
+          sliderImg.src = product.images[currentIndex];
+        });
+        nextBtn.addEventListener("click", () => {
+          currentIndex = (currentIndex + 1) % product.images.length;
+          sliderImg.src = product.images[currentIndex];
+        });
+        setInterval(() => {
+          currentIndex = (currentIndex + 1) % product.images.length;
+          sliderImg.src = product.images[currentIndex];
+        }, 3000);
+
+        wishlistBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const heartIcon = wishlistBtn.querySelector("i");
+          const isActive = heartIcon.classList.contains("text-red-500");
+          
+          if (isActive) {
+            wishlist = wishlist.filter(item => item.id !== product.id);
+            heartIcon.classList.remove("text-red-500");
+          } else {
+            wishlist.push(product);
+            heartIcon.classList.add("text-red-500");
+          }
+          
+          localStorage.setItem("wishlist", JSON.stringify(wishlist));
+          renderWishlist();
+        });
+
+        let selectedSize = null;
+        card.querySelectorAll(".size-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            card.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedSize = btn.dataset.size;
+          });
+        });
+
+        card.querySelector(".add-to-cart-btn").addEventListener("click", () => {
+          if (!selectedSize) {
+            alert("Please select a size");
+            return;
+          }
+          const existing = cart.find(i => i.id === product.id && i.size === selectedSize);
+          if (existing) {
+            existing.quantity += 1;
+          } else {
+            cart.push({ ...product, size: selectedSize, quantity: 1 });
+          }
+          localStorage.setItem("cart", JSON.stringify(cart));
+          updateCartCount();
+          cartCount.classList.add("cart-animate");
+          setTimeout(() => cartCount.classList.remove("cart-animate"), 400);
+        });
+
+        sliderImg.addEventListener("click", () => {
+          window.location.href = `product.html?id=${product.id}`;
+        });
+
+        productsContainer.appendChild(card);
+      });
+    }
+
+    function renderWishlist() {
+      wishlistItems.innerHTML = "";
+      if (wishlist.length === 0) {
+        wishlistItems.innerHTML = `<p class="text-center text-gray-500">Your wishlist is empty</p>`;
+        return;
+      }
+      
+      wishlist.forEach(product => {
+        const item = document.createElement("div");
+        item.className = "flex items-center gap-4 mb-4 border-b pb-4";
+        item.innerHTML = `
+          <img src="${product.images[0]}" alt="${product.name}" class="w-20 h-20 object-cover rounded">
+          <div class="flex-grow">
+            <h4 class="font-bold">${product.name}</h4>
+            <p class="text-red-600 font-bold">${product.price.toFixed(2)} EGP</p>
+          </div>
+          <button class="remove-from-wishlist text-red-500" data-id="${product.id}">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        wishlistItems.appendChild(item);
+      });
+
+      document.querySelectorAll(".remove-from-wishlist").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const productId = parseInt(btn.dataset.id);
+          wishlist = wishlist.filter(item => item.id !== productId);
+          localStorage.setItem("wishlist", JSON.stringify(wishlist));
+          renderWishlist();
+          renderProducts();
+        });
+      });
+    }
+
+    function updateCartCount() {
+      cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    function renderCartItems() {
+      cartItems.innerHTML = "";
+      if (cart.length === 0) {
+        cartItems.innerHTML = `<p class="text-center text-gray-500">Your cart is empty</p>`;
+        cartTotal.textContent = "0.00 EGP";
+        return;
+      }
+      let total = 0;
+      cart.forEach((item, index) => {
+        total += item.price * item.quantity;
+        const div = document.createElement("div");
+        div.className = "flex justify-between items-center mb-2 border-b pb-1";
+        div.innerHTML = `
+          <span>${item.name} (${item.size}) × ${item.quantity}</span>
+          <div class="flex items-center gap-2">
+            <span>${(item.price * item.quantity).toFixed(2)} EGP</span>
+            <button class="text-red-500 hover:text-red-700" onclick="removeFromCart(${index})">🗑</button>
+          </div>
+        `;
+        cartItems.appendChild(div);
+      });
+      cartTotal.textContent = total.toFixed(2) + " EGP";
+    }
+
+    window.removeFromCart = function(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCartItems();
+      updateCartCount();
+    };
+
+    cartButton.addEventListener("click", () => {
+      cartDropdown.classList.toggle("hidden");
+      if (!cartDropdown.classList.contains("hidden")) {
+        renderCartItems();
+      }
+    });
+
+    wishlistButton.addEventListener("click", () => {
+      wishlistModal.classList.remove("hidden");
+      renderWishlist();
+    });
+
+    closeWishlist.addEventListener("click", () => {
+      wishlistModal.classList.add("hidden");
+    });
+
+    wishlistModal.addEventListener("click", (e) => {
+      if (e.target === wishlistModal) {
+        wishlistModal.classList.add("hidden");
+      }
+    });
+
+    checkoutBtn.addEventListener("click", () => {
+      if (cart.length === 0) {
+        alert("Your cart is empty");
+        return;
+      }
+      window.location.href = "checkout.html";
+    });
+
+    renderProducts();
+    updateCartCount();
+  </script>
+  <!-- Footer -->
+<footer class="bg-black text-white py-12">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="text-xl font-bold mb-4">TOGA</h3>
+        <p class="text-gray-400">Premium clothing for the modern lifestyle.</p>
+        <div class="flex gap-4 mt-4">
+          <a href="https://www.facebook.com/share/1BThiHEVSr/?mibextid=wwXIfr" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/toga_eg_?igsh=MWF2MGV2dGJ3azdiNg%3D%3D&utm_source=qr" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.tiktok.com/@toga.eg?_t=ZS-8yii9fodbxR&_r=1" class="text-gray-400 hover:text-white"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+      
+      <div>
+        <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+        <ul class="space-y-2">
+          <li><a href="index.html" class="text-gray-400 hover:text-white">Home</a></li>
+          <li><a href="#" class="text-gray-400 hover:text-white">Shop</a></li>
+          <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+          <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h3 class="text-xl font-bold mb-4">Contact Us</h3>
+        <ul class="space-y-2 text-gray-400">
+          <li class="flex items-center gap-2"><i class="fas fa-phone"></i>01030130845</li>
+          <li class="flex items-center gap-2"><i class="fas fa-envelope"></i> info@toga.com</li>
+          <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> Cairo, Egypt</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+      <p>&copy; 2025 TOGA. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
