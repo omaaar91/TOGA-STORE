@@ -186,14 +186,6 @@
     </div>
   </footer>
 
-  <!-- EmailJS Library -->
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script>
-    (function(){
-      emailjs.init("7b9kqgwKpK5WGF8Zl");
-    })();
-  </script>
-
   <script>
     const governorateSelect = document.getElementById("governorate");
     const subtotalField = document.getElementById("subtotal");
@@ -252,58 +244,40 @@
 
     document.getElementById("checkoutForm").addEventListener("submit", function(e) {
       e.preventDefault();
-
-      emailjs.sendForm(
-        "service_8lldcyc",
-        "template_dla4amj",
-        this
-      ).then(function() {
-        alert("تم إرسال الطلب بنجاح ✅");
-        localStorage.removeItem("cart");
-        window.location.href = "index.html";
-      }, function(error) {
-        alert("حدث خطأ أثناء الإرسال ❌");
-        console.error(error);
-      });
+      
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+      const governorate = document.getElementById("governorate").value;
+      const address = document.getElementById("address").value;
+      const orderItems = document.getElementById("order_items").value;
+      const total = document.getElementById("totalPrice").textContent;
+      
+      // إنشاء رسالة واتساب تحتوي على تفاصيل الطلب
+      const whatsappMessage = 
+        `مرحباً، أريد طلب المنتجات التالية:\n\n` +
+        `*الاسم:* ${name}\n` +
+        `*رقم الهاتف:* ${phone}\n` +
+        `*المحافظة:* ${governorate}\n` +
+        `*العنوان:* ${address}\n\n` +
+        `*تفاصيل الطلب:*\n${orderItems}\n\n` +
+        `*المجموع الكلي:* ${total} جنيه\n\n` +
+        `شكراً لكم!`;
+      
+      // ترميز الرسالة لاستخدامها في رابط واتساب
+      const encodedMessage = encodeURIComponent(whatsappMessage);
+      
+      // رقم الهاتف الخاص بالمتجر (يمكن تغييره حسب الحاجة)
+      const whatsappNumber = "201030130845";
+      
+      // فتح رابط واتساب مع الرسالة
+      window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+      
+      // مسح السلة بعد إرسال الطلب
+      localStorage.removeItem("cart");
+      
+      // توجيه المستخدم إلى الصفحة الرئيسية
+      window.location.href = "index.html";
     });
   </script>
-  <footer class="bg-black text-white py-12">
-    <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div>
-          <h3 class="text-xl font-bold mb-4">TOGA</h3>
-          <p class="text-gray-400">Premium clothing for the modern lifestyle.</p>
-          <div class="flex gap-4 mt-4">
-            <a href="https://www.facebook.com/share/1BThiHEVSr/?mibextid=wwXIfr" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
-            <a href="https://www.instagram.com/toga_eg_?igsh=MWF2MGV2dGJ3azdiNg%3D%3D&utm_source=qr" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
-            <a href="https://www.tiktok.com/@toga.eg?_t=ZS-8yii9fodbxR&_r=1" class="text-gray-400 hover:text-white"><i class="fab fa-tiktok"></i></a>
-          </div>
-        </div>
-        
-        <div>
-          <h3 class="text-xl font-bold mb-4">Quick Links</h3>
-          <ul class="space-y-2">
-            <li><a href="index.html" class="text-gray-400 hover:text-white">Home</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white">Shop</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h3 class="text-xl font-bold mb-4">Contact Us</h3>
-          <ul class="space-y-2 text-gray-400">
-            <li class="flex items-center gap-2"><i class="fas fa-phone"></i>01030130845</li>
-            <li class="flex items-center gap-2"><i class="fas fa-envelope"></i> info@toga.com</li>
-            <li class="flex items-center gap-2"><i class="fas fa-map-marker-alt"></i> Cairo, Egypt</li>
-          </ul>
-        </div>
-      </div>
-      
-      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-        <p>&copy; 2025 TOGA. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
 </body>
 </html>
