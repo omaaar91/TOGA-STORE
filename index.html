@@ -75,6 +75,21 @@
    .wishlist-btn.active { color: red; }
    .social-icon { transition: transform 0.3s ease; }
    .social-icon:hover { transform: scale(1.2); }
+
+   @media (max-width: 640px) {
+     #productsContainer {
+       grid-template-columns: repeat(2, 1fr);
+       gap: 1rem;
+     }
+     
+     .product-card {
+       margin-bottom: 1rem;
+     }
+     
+     .slider {
+       aspect-ratio: 3 / 4;
+     }
+   }
   </style>
 </head>
 <body class="text-gray-900">
@@ -122,7 +137,7 @@
   <main class="container mx-auto px-4 py-8">
     <section id="products">
       <h2 class="text-3xl font-bold mb-6 text-center">Our Products</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" id="productsContainer"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8" id="productsContainer"></div>
     </section>
   </main>
 
